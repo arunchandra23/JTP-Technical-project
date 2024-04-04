@@ -1,5 +1,5 @@
 import argparse
-from utils import process_and_store_images_parallel
+from utils import process_and_store_images_parallel,process_and_store_images_parallel_v2
 from qdrant_client import QdrantClient
 from dotenv import load_dotenv
 import os
@@ -9,8 +9,9 @@ def main(args):
     try:
         client = QdrantClient(url=os.getenv('QDRANT_URL'), api_key=os.getenv('QDRANT_API_KEY'))
 
-        vector_dim = 154  # Total dimension of concatenated feature vectors
-        process_and_store_images_parallel(args.dataset_path,client, args.collection_name, vector_dim,args.csv_path, max_workers=None)
+        vector_dim = 3072  # Total dimension of concatenated feature vectors
+        # process_and_store_images_parallel(args.dataset_path,client, args.collection_name, vector_dim,args.csv_path, max_workers=None)
+        process_and_store_images_parallel_v2(args.dataset_path,client, args.collection_name, vector_dim,args.csv_path, max_workers=None)
         print(f"Stored embeddings for images in the collection '{args.collection_name}'.")
         
     except Exception as e:
