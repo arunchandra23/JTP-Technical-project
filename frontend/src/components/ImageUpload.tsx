@@ -102,7 +102,7 @@ const ImageUpload: React.FC<Props> = ({ onRecommendations }) => {
           </div>
         )}
         <div className="flex items-center justify-center my-5">
-        <button onClick={handleSubmit} className="ml-4  self-center bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+        <button onClick={handleSubmit} className="ml-4  self-center bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">
           Recommend
         </button>
 

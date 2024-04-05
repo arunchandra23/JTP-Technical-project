@@ -1,42 +1,12 @@
 import os
-import cv2
 import numpy as np
 import pandas as pd
-from skimage.feature import local_binary_pattern
 from concurrent.futures import ProcessPoolExecutor
 from qdrant_client.http import models
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.models import load_model
 import uuid as uuidpy
 
-def compute_color_histogram(image, bins=32):
-    hist = [cv2.calcHist([image], [i], None, [bins], [0, 256]) for i in range(3)]
-    hist = np.concatenate(hist).flatten()
-    hist = hist / hist.sum()
-    return hist
-
-def compute_texture_features(image, radius=3, n_points=24):
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    lbp = local_binary_pattern(gray_image, n_points, radius, method='uniform')
-    lbp_hist, _ = np.histogram(lbp, bins=np.arange(0, n_points + 3), range=(0, n_points + 2))
-    lbp_hist = lbp_hist / lbp_hist.sum()
-    return lbp_hist
-
-def compute_edge_features(image):
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    sobelx = cv2.Sobel(gray_image, cv2.CV_64F, 1, 0, ksize=5)
-    sobely = cv2.Sobel(gray_image, cv2.CV_64F, 0, 1, ksize=5)
-    edges = np.sqrt(sobelx ** 2 + sobely ** 2)
-    edge_hist, _ = np.histogram(edges, bins=32, range=(0, 256))
-    edge_hist = edge_hist / edge_hist.sum()
-    return edge_hist
-
-def compute_feature_vector(image_path):
-    image=cv2.imread(image_path)
-    color_features = compute_color_histogram(image)
-    texture_features = compute_texture_features(image)
-    edge_features = compute_edge_features(image)
-    feature_vector = np.concatenate([color_features*2, texture_features, edge_features*3])
-    # print("FV>>",len(feature_vector))
-    return feature_vector
 
 def create_qdrant_collection(client, collection_name, vector_dim):
     try:
@@ -59,90 +29,7 @@ def store_single_embedding_in_qdrant(client, collection_name, image_detail, feat
     # Insert the point into the collection
     client.upsert(collection_name=collection_name, points=[point], wait=True)
     print(f"Stored embedding for image '{image_detail['image_path']}' in the collection '{collection_name}'.")
-def store_embeddings_in_qdrant(client, collection_name, image_files, feature_vectors):
-    points = []
-    for img_path, feature_vector in zip(image_files, feature_vectors):
-        payload = {"image_path": img_path}
-        points.append(models.PointStruct(
-            id=str(uuidpy.uuid4()),
-            vector=feature_vector.tolist(),
-            payload=payload
-        ))
 
-    client.upsert(
-        collection_name=collection_name,
-        points=points,
-        wait=True
-    )
-def find_similar_images_in_qdrant_v1(client, collection_name, input_image, top_k=2):
-    input_features = compute_feature_vector(input_image)
-
-    # input_reduced_features = input_features
-    search_result = client.search(
-        collection_name=collection_name,
-        query_vector=input_features.tolist(),
-        query_filter=None,
-        limit=top_k,
-    )
-    print("SR>>",search_result)
-    similar_images = []
-    for hit in search_result:
-        similar_images.append(hit.payload["image_path"])
-    return similar_images
-def find_similar_images_in_qdrant(client, collection_name, input_image, top_k=2):
-    input_features = compute_feature_vector(input_image)
-
-    # input_reduced_features = input_features
-    search_result = client.search(
-        collection_name=collection_name,
-        query_vector=input_features.tolist(),
-        query_filter=None,
-        limit=top_k,
-    )
-    print("SR>>",search_result)
-    similar_images = []
-    for hit in search_result:
-        similar_images.append({"filename":hit.payload['filename'], "url":hit.payload['url']})
-    return similar_images
-
-
-def compute_feature_vectors_parallel(image_dataset, max_workers=None):
-    with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        feature_vectors = list(executor.map(compute_feature_vector, image_dataset))
-    return feature_vectors
-
-
-def process_image(image_detail):
-    # Wrapper function for processing a single image
-    # Returns a tuple containing the image_path and its feature_vector
-    feature_vector = compute_feature_vector(image_detail['image_path'])
-    return (image_detail, feature_vector)
-
-def process_and_store_images_parallel(dataset_path,client, collection_name, vector_dim,csv_path, max_workers=None):
-    # Ensure the collection exists or create it if not
-    create_qdrant_collection(client, collection_name, vector_dim)
-    
-    # Read the csv file containing image details and urls
-    image_details=[]
-    csv=pd.read_csv(csv_path)
-    for row in csv.iterrows():
-        image_path=dataset_path+row[1]['filename']
-        if(os.path.exists(image_path)):
-            detail={}
-            detail['image_path']=image_path
-            detail['filename']=row[1]['filename']
-            detail['url']=row[1]['link']
-            image_details.append(detail)
-    # Process images in parallel to compute feature vectors
-    with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        for image_detail, feature_vector in executor.map(process_image, image_details):
-            store_single_embedding_in_qdrant(client, collection_name, image_detail, feature_vector)
-            
-
-# ==========================================
-from tensorflow.keras.preprocessing import image
-import numpy as np
-from tensorflow.keras.models import load_model
 
 def preprocess_image(image_path, target_size):
     # Load the image
@@ -163,23 +50,21 @@ def extract_embeddings(image_paths, encoder, target_size):
         embeddings.append(embedding.flatten())  # Flatten the embedding to a 1D vector
     return np.array(embeddings)
 
-def compute_feature_vector_v2(image_path):
-    
+def compute_feature_vector(image_path):
 
     # Load the saved encoder model
-    loaded_encoder = load_model('/media/arunchandra/local/personal/JTP-Technical-project/backend/data/encoder_model_test_train_2ep.h5')
+    loaded_encoder = load_model(os.getenv('ENCODER_MODEL_PATH'))
     
     return extract_embeddings([image_path], loaded_encoder, target_size=(32, 32))[0]
 
-def process_image_v2(image_detail):
+def process_image(image_detail):
     # Wrapper function for processing a single image
     # Returns a tuple containing the image_path and its feature_vector
     print("IP>>",image_detail['image_path'])
-    feature_vector = compute_feature_vector_v2(image_detail['image_path'])
+    feature_vector = compute_feature_vector(image_detail['image_path'])
     return (image_detail, feature_vector)
 
-def process_and_store_images_parallel_v2(dataset_path,client, collection_name, vector_dim,csv_path, max_workers=None):
-    # Ensure the collection exists or create it if not
+def process_and_store_images_parallel(dataset_path,client, collection_name, vector_dim,csv_path, max_workers=None):
     create_qdrant_collection(client, collection_name, vector_dim)
     
     # Read the csv file containing image details and urls
@@ -195,11 +80,11 @@ def process_and_store_images_parallel_v2(dataset_path,client, collection_name, v
             image_details.append(detail)
     # Process images in parallel to compute feature vectors
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        for image_detail, feature_vector in executor.map(process_image_v2, image_details):
+        for image_detail, feature_vector in executor.map(process_image, image_details):
             store_single_embedding_in_qdrant(client, collection_name, image_detail, feature_vector)
 
-def find_similar_images_in_qdrant_v2(client, collection_name, input_image, top_k=2):
-    loaded_encoder = load_model('/media/arunchandra/local/personal/JTP-Technical-project/backend/data/encoder_model_test_train_2ep.h5')
+def find_similar_images_in_qdrant(client, collection_name, input_image, top_k=2):
+    loaded_encoder = load_model(os.getenv('ENCODER_MODEL_PATH'))
 
     input_embedding = extract_embeddings([input_image], loaded_encoder, target_size=(32, 32))[0]
 
@@ -215,3 +100,75 @@ def find_similar_images_in_qdrant_v2(client, collection_name, input_image, top_k
     for hit in search_result:
         similar_images.append({"filename":hit.payload['filename'], "url":hit.payload['url']})
     return similar_images
+
+import random
+
+def suggest_unique_images(client, collection_name, top_k=20):
+    """
+    Suggests a random sample of unique images from a Qdrant collection.
+    
+    Args:
+    - client (QdrantClient): The Qdrant client.
+    - collection_name (str): The name of the collection to query.
+    - sample_size (int): The number of unique images to suggest.
+    
+    Returns:
+    - list of dict: A list of dictionaries, each containing the 'id' and 'image_path' of the suggested images.
+    """
+    # Fetch all point IDs (or a large sample) from the collection
+    search_result = client.scroll(collection_name=collection_name, limit=10000)
+    points = search_result[0]
+    
+    # Randomly select point IDs without replacement to ensure uniqueness
+    selected_points = random.sample(points, min(top_k, len(points)))
+    
+    # Extract the image_path and other relevant info from the selected points
+    suggested_images = [{'id': point.id, 'url': point.payload.get('url')} for point in selected_points]
+    
+    return suggested_images
+
+
+def get_similar_images_by_id(client, collection_name, image_id, top_k=5,page=0):
+    """
+    Retrieves similar images to the given image ID from a Qdrant collection.
+    
+    Args:
+    - client (QdrantClient): The Qdrant client instance.
+    - collection_name (str): The name of the collection where images are stored.
+    - image_id (str): The ID of the image to find similarities for.
+    - top_k (int): The number of similar images to retrieve.
+    
+    Returns:
+    - list: A list of similar image IDs, excluding the original image ID.
+    """
+    # Fetch the vector of the specified image ID
+    point = client.retrieve(
+    collection_name=f"{collection_name}",
+    ids=[image_id],
+    with_vectors=True
+    )
+    if len(point)==0:
+        return []  # Return an empty list if the image ID is not found
+    point=point[0]
+    query_vector = point.vector
+    
+    # Search for similar images using the vector of the given image ID
+    search_results = client.search(
+        collection_name=collection_name,
+        query_vector=query_vector,
+        query_filter=models.Filter(must_not=[models.FieldCondition(
+            key="id",
+                match=models.MatchValue(
+                    value=image_id,
+                    )
+            )]), 
+        limit=top_k,
+        offset = page * top_k
+    )
+    
+    # Extract the IDs and Urls of the similar images
+    similar_image_ids = [{"id":hit.id,"url":hit.payload['url']} for hit in search_results]
+    
+    return similar_image_ids
+
+

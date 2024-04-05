@@ -7,3 +7,5 @@ fastapi==0.110.1
 python-multipart==0.0.9
 pandas==2.2.1
 tensorflow==2.14.0
+kaggle==1.6.8
+scikit-learn==1.4.1.post1
