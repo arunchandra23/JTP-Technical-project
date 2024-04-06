@@ -1,10 +1,10 @@
+import { setImageUrls } from "./redux/imageSlice";
 import request from "./request";
-import { setImageUrls } from "./redux/store";
 
-export const fetchRandomProducts = async (dispatch) => {
+export const fetchRandomProducts = async (dispatch:any) => {
     try {
       const response = await request.get(
-        "/get-products/?collection_name=fashion_t_t_2epochs&top_k=20"
+        `/get-products/?collection_name=${import.meta.env.VITE_REACT_APP_QDRANT_COLLECTION}&top_k=20`
       );
       dispatch(setImageUrls(response.data)); // Assuming the API returns an array of image URLs
     } catch (error) {

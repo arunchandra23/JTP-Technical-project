@@ -23,9 +23,9 @@ def main(args):
         return None
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Used to create and store image embeddings in a Qdrant collection.')
-    parser.add_argument('--collection_name',default="fashion_products_vdb",type=str, help='Name of the Qdrant collection.')
+    parser.add_argument('--collection_name',default="fashion_products_vdb_v2",type=str, help='Name of the Qdrant collection.')
     parser.add_argument('--dataset_path', type=str,default="backend/data/images/", help='Path to the folder containing images.')
-    parser.add_argument('--csv_path', type=str,default="backend/model/image_details.csv", help='Path to the csv file containing image details.')
+    parser.add_argument('--csv_path', type=str,default="model/data.csv", help='Path to the csv file containing image details.')
 
     args = parser.parse_args()
 

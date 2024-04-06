@@ -1,4 +1,7 @@
 import os
+import shlex
+import subprocess
+import json
 import numpy as np
 import pandas as pd
 from concurrent.futures import ProcessPoolExecutor
@@ -6,29 +9,71 @@ from qdrant_client.http import models
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import load_model
 import uuid as uuidpy
+from logger import logger
+
+
+
+def check_collection_exists(client, collection_name):
+    try:
+        client.get_collection(collection_name)
+        return True
+    except Exception as e:    
+        return False
+
+
+def call_curl(curl):
+    args = shlex.split(curl)
+    process = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    return json.loads(stdout.decode('utf-8'))
+
+
+def restore_qdrant_collection(qdrant_url, collection_name, api_key, snapshot_file_path):
+    """
+    Restore a Qdrant collection from a snapshot file.
+
+    Parameters:
+    - qdrant_url: The URL of the Qdrant server.
+    - collection_name: The name of the collection to restore.
+    - api_key: API key for Qdrant authentication.
+    - snapshot_file_path: The file path to the snapshot file.
+    """
+    snapshot_file_path = os.path.abspath(snapshot_file_path)
+    cu=f"""curl -X POST '{qdrant_url}/collections/{collection_name}/snapshots/upload?priority=snapshot' \
+    -H 'api-key: {api_key}' \
+    -H 'Content-Type:multipart/form-data' \
+    -F 'snapshot=@{snapshot_file_path}'"""
+    output = call_curl(cu)
+    logger.info(output)
+    
 
 
 def create_qdrant_collection(client, collection_name, vector_dim):
     try:
-        client.create_collection(
-            collection_name=collection_name,
-            vectors_config=models.VectorParams(size=vector_dim, distance=models.Distance.COSINE),
-        )
+        if(not check_collection_exists(client=client,collection_name=collection_name)):
+            client.create_collection(
+                collection_name=collection_name,
+                vectors_config=models.VectorParams(size=vector_dim, distance=models.Distance.COSINE),
+            )
+            logger.info(f"Collection {collection_name} created successfully")
+            return
+        logger.info(f"Collection {collection_name} already exists")
+        
+        
     except Exception as e:
-        print(f"Failed to create collection '{collection_name}'.")
-        print(e)
+        logger.error(f"Failed to create collection '{collection_name}'. Error: {e}")
 
 
 def store_single_embedding_in_qdrant(client, collection_name, image_detail, feature_vector):
     # Create a payload with the image path
-    payload = { "filename":image_detail['filename'], "url":image_detail['url']}
+    payload = { "filename":image_detail['filename'], "url":image_detail['url'],"gender":image_detail['gender'],"masterCategory":image_detail['masterCategory'],"subCategory":image_detail['subCategory'],"articleType":image_detail['articleType'],"baseColour":image_detail['baseColour'],"season":image_detail['season'],"year":image_detail['year'],"usage":image_detail['usage'],"productDisplayName":image_detail['productDisplayName']}
     # Generate a unique ID for the point
     point_id = str(uuidpy.uuid4())
     # Create the point structure
     point = models.PointStruct(id=point_id, vector=feature_vector.tolist(), payload=payload)
     # Insert the point into the collection
     client.upsert(collection_name=collection_name, points=[point], wait=True)
-    print(f"Stored embedding for image '{image_detail['image_path']}' in the collection '{collection_name}'.")
+    logger.info(f"Stored embedding for image '{image_detail['image_path']}' in the collection '{collection_name}'.")
 
 
 def preprocess_image(image_path, target_size):
@@ -42,6 +87,7 @@ def preprocess_image(image_path, target_size):
     img_array = np.expand_dims(img_array, axis=0)
     return img_array
 
+
 def extract_embeddings(image_paths, encoder, target_size):
     embeddings = []
     for image_path in image_paths:
@@ -50,38 +96,49 @@ def extract_embeddings(image_paths, encoder, target_size):
         embeddings.append(embedding.flatten())  # Flatten the embedding to a 1D vector
     return np.array(embeddings)
 
-def compute_feature_vector(image_path):
 
+def compute_feature_vector(image_path):
     # Load the saved encoder model
     loaded_encoder = load_model(os.getenv('ENCODER_MODEL_PATH'))
-    
     return extract_embeddings([image_path], loaded_encoder, target_size=(32, 32))[0]
+
 
 def process_image(image_detail):
     # Wrapper function for processing a single image
     # Returns a tuple containing the image_path and its feature_vector
-    print("IP>>",image_detail['image_path'])
+    logger.info(f"IP>>{image_detail['image_path']}")
     feature_vector = compute_feature_vector(image_detail['image_path'])
     return (image_detail, feature_vector)
 
+
 def process_and_store_images_parallel(dataset_path,client, collection_name, vector_dim,csv_path, max_workers=None):
     create_qdrant_collection(client, collection_name, vector_dim)
-    
     # Read the csv file containing image details and urls
     image_details=[]
     csv=pd.read_csv(csv_path)
+    print(csv.head())
     for row in csv.iterrows():
-        image_path=dataset_path+row[1]['filename']
+        image_path=os.path.join(dataset_path,row[1]['filename'])
         if(os.path.exists(image_path)):
             detail={}
             detail['image_path']=image_path
             detail['filename']=row[1]['filename']
             detail['url']=row[1]['link']
+            detail['gender']=row[1]['gender']
+            detail['masterCategory']=row[1]['masterCategory']
+            detail['subCategory']=row[1]['subCategory']
+            detail['articleType']=row[1]['articleType']
+            detail['baseColour']=row[1]['baseColour']
+            detail['season']=row[1]['season']
+            detail['year']=row[1]['year']
+            detail['usage']=row[1]['usage']
+            detail['productDisplayName']=row[1]['productDisplayName']
             image_details.append(detail)
     # Process images in parallel to compute feature vectors
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         for image_detail, feature_vector in executor.map(process_image, image_details):
             store_single_embedding_in_qdrant(client, collection_name, image_detail, feature_vector)
+
 
 def find_similar_images_in_qdrant(client, collection_name, input_image, top_k=2):
     loaded_encoder = load_model(os.getenv('ENCODER_MODEL_PATH'))
@@ -95,7 +152,7 @@ def find_similar_images_in_qdrant(client, collection_name, input_image, top_k=2)
         query_filter=None,
         limit=top_k,
     )
-    print("SR>>",search_result)
+    logger.info(f"SR>>{search_result}")
     similar_images = []
     for hit in search_result:
         similar_images.append({"filename":hit.payload['filename'], "url":hit.payload['url']})
@@ -103,6 +160,24 @@ def find_similar_images_in_qdrant(client, collection_name, input_image, top_k=2)
 
 import random
 
+
+def qdrant_payload_as_dict(points):
+    payloads = [{
+        'id': point.id, 
+        'url': point.payload.get('url'),
+        'productDisplayName': point.payload.get('productDisplayName'),
+        'gender': point.payload.get('gender'),
+        'baseColour': point.payload.get('baseColour'),
+        'masterCategory': point.payload.get('masterCategory'),
+        'subCategory': point.payload.get('subCategory'),
+        'articleType': point.payload.get('articleType'),
+        'season': point.payload.get('season'),
+        'usage': point.payload.get('usage'),
+        } for point in points]
+    return payloads
+     
+     
+     
 def suggest_unique_images(client, collection_name, top_k=20):
     """
     Suggests a random sample of unique images from a Qdrant collection.
@@ -123,8 +198,7 @@ def suggest_unique_images(client, collection_name, top_k=20):
     selected_points = random.sample(points, min(top_k, len(points)))
     
     # Extract the image_path and other relevant info from the selected points
-    suggested_images = [{'id': point.id, 'url': point.payload.get('url')} for point in selected_points]
-    
+    suggested_images = qdrant_payload_as_dict(selected_points)
     return suggested_images
 
 
@@ -166,8 +240,8 @@ def get_similar_images_by_id(client, collection_name, image_id, top_k=5,page=0):
         offset = page * top_k
     )
     
-    # Extract the IDs and Urls of the similar images
-    similar_image_ids = [{"id":hit.id,"url":hit.payload['url']} for hit in search_results]
+    # Extract the IDs and payload of the similar images
+    similar_image_ids = qdrant_payload_as_dict(search_results)
     
     return similar_image_ids
 

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Spinner: React.FC = ({children}) => {
+const Spinner: React.FC<{ children: React.ReactNode }> = ({children}) => {
   return (
     <div className="relative items-center block max-w-sm p-6 bg-white border border-gray-100 rounded-lg hover:bg-gray-100">
         {children}

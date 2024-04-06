@@ -55,7 +55,7 @@ const ImageUpload: React.FC<Props> = ({ onRecommendations }) => {
 
       try {
         // API endpoint as given in the curl command
-        const response = await fetch('http://127.0.0.1:8000/find-similar-images/?collection_name=fashion_t_t_2epochs&top_k=10', {
+        const response = await fetch('http://127.0.0.1:8000/find-similar-images/?collection_name=fashion_products_vdb&top_k=10', {
           method: 'POST',
           headers: {
             'accept': 'application/json',

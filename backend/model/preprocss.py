@@ -55,7 +55,7 @@ os.remove(zip_path)
 
 
 # Load the CSV file
-df = pd.read_csv('./backend/model/styles.csv')
+df = pd.read_csv('./backend/model/data.csv')
 df.fillna({'masterCategory': 'Apparel', 'subCategory': 'Topwear', 'season': 'Summer', 'usage': 'Casual'}, inplace=True)
 # Combine the columns for stratification
 df['stratify_col'] = df['masterCategory'] + "_" + df['subCategory'] + "_" + df['season'] + "_" + df['usage']
