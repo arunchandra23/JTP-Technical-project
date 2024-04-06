@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { ModalData, ViewedImage } from './types';
+import { ModalData,ImageData } from '../common/types';
 
 export const imageSlice = createSlice({
   name: 'image',
@@ -7,10 +7,10 @@ export const imageSlice = createSlice({
     viewedImage: null,
     imageUrls: [],
     recommendationPage: 0,
-    modalData: { visible: false, imageUrl: null, imageId: null },
+    modalData: { visible: false, imageData: null},
   },
   reducers: {
-    setViewedImage: (state, action: PayloadAction<ViewedImage | any>) => {
+    setViewedImage: (state, action: PayloadAction<ImageData | any>) => {
       state.viewedImage = action.payload;
     },
     setImageUrls: (state, action: PayloadAction<string[] | any>) => {

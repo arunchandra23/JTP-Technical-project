@@ -3,16 +3,15 @@ import request from "../request";
 import { fetchRandomProducts } from "../utils";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { setImageUrls, setModalData } from "../redux/imageSlice";
+import { ImageData } from "../common/types";
+import ImageCard from "./ImageCard";
 
-interface ImageUrl {
-  url: string;
-  id: string;
-}
+
 interface RecommendationsProps {
   handleRefresh: () => void;
 }
 const Recommendations: React.FC<RecommendationsProps> = ({ handleRefresh }) => {
-  const imageUrls: ImageUrl[] = useAppSelector(
+  const imageUrls: ImageData[] = useAppSelector(
     (state) => state.image.imageUrls
   );
   const recommendationPage = useAppSelector(
@@ -33,7 +32,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ handleRefresh }) => {
             viewedImage.imageId
           }&collection_name=${
             import.meta.env.VITE_REACT_APP_QDRANT_COLLECTION
-          }&top_k=20&page=${recommendationPage}`
+          }&top_k=10&page=${recommendationPage}`
         );
         dispatch(setImageUrls(response.data)); // Assuming the API returns an array of image URLs
       } catch (error) {
@@ -42,8 +41,8 @@ const Recommendations: React.FC<RecommendationsProps> = ({ handleRefresh }) => {
     };
     if (viewedImage !== null) fetchRecommendations();
   }, [viewedImage, recommendationPage]);
-  const handleView = async (imageUrl: string, imageId: string) => {
-    dispatch(setModalData({ visible: true, imageUrl, imageId }));
+  const handleView = async (image:ImageData) => {
+    dispatch(setModalData({ visible: true, imageData:image}));
   };
 
   return (
@@ -75,17 +74,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ handleRefresh }) => {
       <div className="bg-gray-600 w-auto h-0.5"></div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 max-h-96 overflow-y-scroll px-4 py-8 bg-gray-100">
         {imageUrls.map((image, index) => (
-          <div
-            key={image.id}
-            className="relative flex justify-center items-center rounded-xl border-2 border-gray-700 overflow-hidden bg-white cursor-pointer opacity-100 hover:opacity-80"
-            onClick={() => handleView(image.url, image.id)}
-          >
-            <img
-              src={image.url}
-              alt={`Image ${index}`}
-              className="w-auto h-44"
-            />
-          </div>
+          <ImageCard key={index} image={image} onClick={handleView} />
         ))}
       </div>
     </>

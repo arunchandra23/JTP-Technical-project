@@ -1,3 +1,4 @@
+import { ImageData } from "../common/types";
 import ImageModal from "../components/ImageModal";
 import Recommendations from "../components/Recommendations";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
@@ -6,7 +7,7 @@ import { fetchRandomProducts } from "../utils";
 
 const HomeScreen = () => {
   const dispatch = useAppDispatch();
-  const viewedImage: any = useAppSelector((state) => state.image.viewedImage);
+  const viewedImage: ImageData = useAppSelector((state) => state.image.viewedImage);
   const recommendationPage = useAppSelector(
     (state) => state.image.recommendationPage
   );
@@ -27,10 +28,10 @@ const HomeScreen = () => {
         <h1 className="text-3xl">Viewed product</h1>
         <div className="bg-gray-600 w-auto h-0.5"></div>
         {viewedImage ? (
-          <div className="flex bg-gray-100 rounded-xl border-2 border-gray-700 border-dashed m-2 justify-center items-center p-4">
+          <div className="flex bg-gray-100 rounded-xl border-2 border-gray-400 border-dashed m-2 justify-center items-center p-4">
             <div className="flex justify-center items-center mr-4 rounded-xl border-2 border-gray-700 overflow-hidden">
               <img
-                src={viewedImage.imageUrl}
+                src={viewedImage.url}
                 alt="Viewed product"
                 className="w-auto h-36"
               />
@@ -45,7 +46,7 @@ const HomeScreen = () => {
             </div>
           </div>
         ) : (
-          <div className="flex items-center justify-center text-center p-4 min-h-44 bg-gray-100 rounded-xl border-2 border-gray-700 border-dashed m-2 ">
+          <div className="flex items-center justify-center text-center p-4 min-h-44 bg-gray-100 rounded-xl border-2 border-gray-400 border-dashed m-2 ">
             <div>
               <h2 className="text-xl font-semibold">No product viewed yet</h2>
               <p className="text-gray-500">
