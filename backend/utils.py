@@ -10,8 +10,15 @@ from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import load_model
 import uuid as uuidpy
 from logger import logger
+import base64
 
 
+
+def create_onedrive_directdownload (onedrive_link):
+    data_bytes64 = base64.b64encode(bytes(onedrive_link, 'utf-8'))
+    data_bytes64_String = data_bytes64.decode('utf-8').replace('/','_').replace('+','-').rstrip("=")
+    resultUrl = f"https://api.onedrive.com/v1.0/shares/u!{data_bytes64_String}/root/content"
+    return resultUrl
 
 def check_collection_exists(client, collection_name):
     try:
@@ -162,18 +169,20 @@ import random
 
 
 def qdrant_payload_as_dict(points):
-    payloads = [{
-        'id': point.id, 
-        'url': point.payload.get('url'),
-        'productDisplayName': point.payload.get('productDisplayName'),
-        'gender': point.payload.get('gender'),
-        'baseColour': point.payload.get('baseColour'),
-        'masterCategory': point.payload.get('masterCategory'),
-        'subCategory': point.payload.get('subCategory'),
-        'articleType': point.payload.get('articleType'),
-        'season': point.payload.get('season'),
-        'usage': point.payload.get('usage'),
-        } for point in points]
+    payloads=[]
+    for point in points:
+        payloads.append({
+            'id': point.id, 
+            'url': point.payload.get('url'),
+            'productDisplayName': point.payload.get('productDisplayName'),
+            'gender': point.payload.get('gender'),
+            'baseColour': point.payload.get('baseColour'),
+            'masterCategory': point.payload.get('masterCategory'),
+            'subCategory': point.payload.get('subCategory'),
+            'articleType': point.payload.get('articleType'),
+            'season': point.payload.get('season'),
+            'usage': point.payload.get('usage'),
+            })
     return payloads
      
      
@@ -236,12 +245,14 @@ def get_similar_images_by_id(client, collection_name, image_id, top_k=5,page=0):
                     value=image_id,
                     )
             )]), 
-        limit=top_k,
-        offset = page * top_k
+        limit=top_k+1,
+        offset = page * top_k+1
     )
-    
+    if(len(search_results)!=0):
+        if(search_results[0].id==image_id):
+            search_results.pop(0)
     # Extract the IDs and payload of the similar images
-    similar_image_ids = qdrant_payload_as_dict(search_results)
+    similar_image_ids = qdrant_payload_as_dict(search_results[:top_k])
     
     return similar_image_ids
 

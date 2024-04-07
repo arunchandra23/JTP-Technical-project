@@ -7,7 +7,7 @@ import { fetchRandomProducts } from "../utils";
 
 const HomeScreen = () => {
   const dispatch = useAppDispatch();
-  const viewedImage: ImageData = useAppSelector((state) => state.image.viewedImage);
+  const viewedImage: ImageData | any= useAppSelector((state) => state.image.viewedImage);
   const recommendationPage = useAppSelector(
     (state) => state.image.recommendationPage
   );
@@ -24,7 +24,7 @@ const HomeScreen = () => {
   };
   return (
     <div className="flex justify-center items-center  inset-0 py-16 bg-gray-200 overflow-hidden">
-      <div className="container mx-auto my-auto p-4 max-w-5xl bg-white rounded-lg shadow-xl">
+      <div className="container mx-auto my-auto p-4 max-w-6xl bg-white rounded-lg shadow-xl">
         <h1 className="text-3xl">Viewed product</h1>
         <div className="bg-gray-600 w-auto h-0.5"></div>
         {viewedImage ? (

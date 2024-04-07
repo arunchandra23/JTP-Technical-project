@@ -17,8 +17,8 @@ const ImageModal: React.FC = () => {
   const handleView = async () => {
     dispatch(
       setViewedImage({
-        url: modalData.imageData.url,
-        imageId: modalData.imageData.id,
+        url: modalData.imageData === null ? "" : modalData.imageData.url,
+        imageId: modalData.imageData === null ? "" : modalData.imageData.id,
       })
     );
     closeModal();
