@@ -25,10 +25,10 @@ const ImageModal: React.FC = () => {
   };
   return (
     <div
-      className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
+      className="fixed inset-0 bg-gray-100 bg-opacity-50 overflow-y-auto h-full w-full"
       id="my-modal"
     >
-      <div className="relative top-20 mx-auto p-5 border max-w-lg w-11/12 md:w-2/3 lg:w-1/3 xl:w-1/4 shadow-lg rounded-md bg-white">
+      <div className="relative top-20 mx-auto p-5 border max-w-lg w-11/12 md:w-2/3 lg:w-1/3 xl:w-1/4 shadow-lg rounded-md bg-gray-50">
         <div className="mt-3 text-center">
           <div>
             <img
@@ -52,13 +52,13 @@ const ImageModal: React.FC = () => {
           <div className="mt-2 flex">
             <button
               onClick={closeModal}
-              className="px-4 py-2 my-2 bg-indigo-600 text-white text-base font-medium tracking-wide rounded-md w-full shadow-sm hover:bg-indigo-500 capitalize transition-colors duration-300 transform"
+              className="px-4 py-2 my-2 bg-indigo-700 text-white text-base font-medium tracking-wide rounded-md w-full shadow-sm hover:bg-indigo-600 capitalize transition-colors duration-300 transform"
             >
               Close
             </button>
             <button
               onClick={handleView}
-              className="px-4 py-2 m-2 bg-indigo-600 text-white text-base  font-medium tracking-wide rounded-md w-full shadow-sm hover:bg-indigo-500 capitalize transition-colors duration-300 transform"
+              className="px-4 py-2 m-2 bg-indigo-700 text-white text-base  font-medium tracking-wide rounded-md w-full shadow-sm hover:bg-indigo-600 capitalize transition-colors duration-300 transform"
             >
               View
             </button>

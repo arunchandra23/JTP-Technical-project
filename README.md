@@ -18,33 +18,6 @@ The model is trained on a dataset from Kaggle, which contains 44k fashion produc
 - **Frontend:** The frontend is developed using **React JS**, with **Redux** for state management, providing a responsive and interactive user interface.
 - **Vector Database:** **Qdrant** is used as the vector database for storing and querying the image feature vectors, facilitating efficient similarity search.
 
-## Model Architecture
-
-### Encoder:
-
-- **Input:** 32x32 RGB images
-- **Convolutional Layer 1:** 32 filters, 3x3 kernel, ReLU activation
-- **Max Pooling Layer 1:** 2x2 pool size
-- **Convolutional Layer 2:** 64 filters, 3x3 kernel, ReLU activation
-- **Max Pooling Layer 2:** 2x2 pool size
-- **Flatten Layer**
-- **Dense Layer 1:** 128 neurons, ReLU activation
-- **Dense Layer 2:** 64 neurons, ReLU activation
-- **Latent Space Layer:** 32 neurons, ReLU activation
-
-### Decoder:
-
-- **Dense Layer 1:** 64 neurons, ReLU activation
-- **Dense Layer 2:** 128 neurons, ReLU activation
-- **Reshape Layer**
-- **Convolutional Transpose Layers:** Mirroring the encoder
-- **Output Layer:** 3 filters (RGB channels), 3x3 kernel, sigmoid activation
-
-<!-- insert image here -->
-<!-- ![plot](./assets/model_architecture.png) -->
-<p align="center">
-  <img src="./assets/model_architecture.png" />
-</p>
 
 ## Setup Instructions
 
@@ -61,3 +34,15 @@ The model is trained on a dataset from Kaggle, which contains 44k fashion produc
         docker-compose build
         docker-compose up
         ```
+    - Frontend: You can start using the app by visiting [http://localhost:3000](http://localhost:3000)
+    - Backend: The FastApi backend that serves the React frontend can be accessed using [http://localhost:8000](http://localhost:8000)
+    - Database: The Qdrant vector database dashboard can be accessed using [http://localhost:6333/dashboard](http://localhost:6333/dashboard)
+
+
+## Model Architecture
+
+<!-- insert image here -->
+<!-- ![plot](./assets/model_architecture.png) -->
+<p align="center" style="height: 600px">
+  <img src="./assets/model_architecture.png" />
+</p>

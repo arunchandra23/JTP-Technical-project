@@ -52,7 +52,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ handleRefresh }) => {
         <div className="">
           <button
             onClick={handleRefresh}
-            className="flex items-center px-1 py-1 mr-2 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-indigo-600 rounded-lg hover:bg-indigo-500"
+            className="flex items-center px-1 py-1 mr-2 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-indigo-700 rounded-lg hover:bg-indigo-600"
           >
             <svg
               className="w-5 h-5 mx-1"
@@ -71,7 +71,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ handleRefresh }) => {
           </button>
         </div>
       </div>
-      <div className="bg-gray-600 w-auto h-0.5"></div>
+      <div className="bg-gray-200 w-auto h-0.5"></div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 max-h-96 overflow-y-scroll px-4 py-8 bg-gray-100">
         {imageUrls.map((image, index) => (
           <ImageCard key={index} image={image} onClick={handleView} />

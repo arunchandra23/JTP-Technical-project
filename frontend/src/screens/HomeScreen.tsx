@@ -28,7 +28,7 @@ const HomeScreen = () => {
         <h1 className="text-3xl">Viewed product</h1>
         <div className="bg-gray-600 w-auto h-0.5"></div>
         {viewedImage ? (
-          <div className="flex bg-gray-100 rounded-xl border-2 border-gray-400 border-dashed m-2 justify-center items-center p-4">
+          <div className="flex bg-gray-200 rounded-xl border-2 border-gray-400 border-dashed m-2 justify-center items-center p-4">
             <div className="flex justify-center items-center mr-4 rounded-xl border-2 border-gray-700 overflow-hidden">
               <img
                 src={viewedImage.url}
@@ -39,14 +39,14 @@ const HomeScreen = () => {
             <div className="w-auto ml-4 flex justify-center items-center ">
               <button
                 onClick={handleRemoveViewedImage}
-                className="bg-indigo-600 font-medium text-white p-1 rounded hover:bg-indigo-500 capitalize transition-colors duration-300 transform"
+                className="bg-indigo-700 font-medium text-white p-1 rounded hover:bg-indigo-600 capitalize transition-colors duration-300 transform"
               >
                 Remove
               </button>
             </div>
           </div>
         ) : (
-          <div className="flex items-center justify-center text-center p-4 min-h-44 bg-gray-100 rounded-xl border-2 border-gray-400 border-dashed m-2 ">
+          <div className="flex items-center justify-center text-center p-4 min-h-44 bg-gray-200 rounded-xl border-2 border-gray-400 border-dashed m-2 ">
             <div>
               <h2 className="text-xl font-semibold">No product viewed yet</h2>
               <p className="text-gray-500">
