@@ -41,13 +41,13 @@ The system is trained using a dataset sourced from Kaggle, encompassing 44,000 f
         
 
 ## Training Pipeline
-### You can also train the model from scratch instead of using pre-trained weights by following below instructions. 
+  You can also train the model from scratch instead of using pre-trained weights by following below instructions. 
 
-  The training process is facilitated through notebooks located in `JTP-Technical-project/preprocessing/`.
+  The training process is facilitated through notebooks located in [`preprocessing/`](preprocessing/).
 
   > **Note:**
-  > For training, running the Qdrant is necessary for saving the feature vectors/embeddings. [Click here to view instruction to set-up Qdrant](assets/QDRANT.md).
-  ### Please follow below steps to train model and store image embeddings:
+  > For training, running the Qdrant is necessary for saving the feature vectors/embeddings. [Setup Qdrant](assets/QDRANT.md).
+  ### Steps:
 
   - **Step-1 : Dataset Preparation**\
       Utilize the [`dataset_pre_processing.ipynb`](preprocessing/dataset_pre_processing.ipynb) notebook for downloading the image dataset and creating test & train splits.
@@ -56,10 +56,24 @@ The system is trained using a dataset sourced from Kaggle, encompassing 44,000 f
   - **Step-3 : Embedding** \
       The [`embed.ipynb`](preprocessing/embed.ipynb) notebook allows for loading the saved model to extract feature vectors from images, which are then stored in the Qdrant vector database.
 
-      Follow instructions [here](assets/QDRANT.md) to take a snapshot of saved embeddings and save it to [backend/data/](backend/data/) as `fashion_products_vdb.snapshot`
+      Follow [instructions](assets/QDRANT.md) to take a snapshot of saved embeddings in Qdrant collection and copy it to [backend/data/](backend/data/) as `fashion_products_vdb.snapshot`
 
 ## Architecture
 
 <p align="center">
-  <img src="./assets/model_architecture.png" alt="Model Architecture" style="height: 600px;" />
+  <img src="./assets/app_architecture.jpg" alt="Model Architecture" style="height: 600px;" />
+</p>
+
+## Screenshots
+<p align="center">
+  <h3>Home screen</h3>
+  <img src="./assets/screenshot_1.png" alt="screenshot_1" style="height: 600px;" />
+</p>
+<p align="center">
+  <h3>View the product</h3>
+  <img src="./assets/screenshot_2.png" alt="screenshot_2" style="height: 600px;" />
+</p>
+<p align="center">
+  <h3>Get Recommendations!</h3>
+  <img src="./assets/screenshot_3.png" alt="screenshot_3" style="height: 600px;" />
 </p>

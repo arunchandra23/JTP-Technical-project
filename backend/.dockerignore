@@ -1,0 +1,9 @@
+.venv
+__pycache__
+embed.py
+model/train.py
+model/preprocess.py
+data/images/
+data/Test/
+data/Train/
+data/fashion-product-images-dataset.zip
