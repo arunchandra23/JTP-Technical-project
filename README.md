@@ -61,19 +61,19 @@ The system is trained using a dataset sourced from Kaggle, encompassing 44,000 f
 ## Architecture
 
 <p align="center">
-  <img src="./assets/app_architecture.jpg" alt="Model Architecture" style="height: 600px;" />
+  <img src="./assets/app_architecture.jpg" alt="Model Architecture" style="height: 400px;" />
 </p>
 
 ## Screenshots
+<h3>Home screen</h3>
 <p align="center">
-  <h3>Home screen</h3>
-  <img src="./assets/screenshot_1.png" alt="screenshot_1" style="height: 600px;" />
+  <img src="./assets/screenshot_1.png" alt="screenshot_1" style="height: 400px;" />
 </p>
+<h3>View the product</h3>
 <p align="center">
-  <h3>View the product</h3>
-  <img src="./assets/screenshot_2.png" alt="screenshot_2" style="height: 600px;" />
+  <img src="./assets/screenshot_2.png" alt="screenshot_2" style="height: 400px;" />
 </p>
+<h3>Get Recommendations!</h3>
 <p align="center">
-  <h3>Get Recommendations!</h3>
-  <img src="./assets/screenshot_3.png" alt="screenshot_3" style="height: 600px;" />
+  <img src="./assets/screenshot_3.png" alt="screenshot_3" style="height: 400px;" />
 </p>
