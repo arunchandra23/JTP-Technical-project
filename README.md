@@ -2,47 +2,64 @@
 
 ## Overview
 
-This project aims to build an Image Recommendation System that enhances the user's shopping experience by suggesting visually similar products. When a user views a product, the system recommends other products that resemble the viewed item, providing a personalized and engaging shopping experience.
+This project focuses on developing an Image Recommendation System aimed at enhancing the shopping experience by suggesting products that are visually similar to the one being viewed by the user. By doing so, it offers a tailored and engaging browsing experience.
 
 ### Core Engine
 
-The recommendation engine is powered by an autoencoder model, which is employed to learn image features in an unsupervised manner. The encoder component of the autoencoder is utilized to generate feature vectors for the images, which are then stored in a Qdrant vector database. This enables efficient similarity search and retrieval of similar products based on their visual content.
+At the heart of the recommendation engine is an autoencoder model. This model is adept at learning image features through an unsupervised learning approach. Specifically, the encoder part of the autoencoder is utilized to generate feature vectors for images. These vectors are subsequently stored in a Qdrant vector database, which underpins efficient similarity searches and retrieval of products that visually align with the user's interests.
 
 ### Dataset
 
-The model is trained on a dataset from Kaggle, which contains 44k fashion products with multiple category labels, descriptions, and high-resolution images. The dataset can be found here: [Fashion Product Images Dataset](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset?rvi=1)
+The system is trained using a dataset sourced from Kaggle, encompassing 44,000 fashion products. This dataset includes multiple category labels, product descriptions, and high-resolution images, making it a comprehensive foundation for training our model. The dataset is accessible here: [Fashion Product Images Dataset](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset?rvi=1)
 
 ### Technology Stack
 
-- **Backend:** The backend is built using **FastAPI**, a modern, fast web framework for building APIs with Python.
-- **Frontend:** The frontend is developed using **React JS**, with **Redux** for state management, providing a responsive and interactive user interface.
-- **Vector Database:** **Qdrant** is used as the vector database for storing and querying the image feature vectors, facilitating efficient similarity search.
-
+- **Backend:** The backend infrastructure is constructed using **FastAPI**, a contemporary and fast web framework designed for building APIs with Python.
+- **Frontend:** For the frontend, **React JS** is employed, with **Redux** serving as the state management solution, ensuring a dynamic and seamless user interface.
+- **Vector Database:** The image feature vectors are stored and queried using **Qdrant**, a vector database that enables efficient similarity searches.
 
 ## Setup Instructions
+  > **Prerequisites:** Docker installed on your machine, and a basic understanding of Docker and terminal commands.
 
-1. **Clone the Repository:**
+1. **Repository Cloning:**
+   Execute the following command to clone the repository:
    ```python
    git clone -b main https://github.com/arunchandra23/JTP-Technical-project.git
    ```
-2. **Inference:**
-    ```bash
-   cd JTP-Technical-project/
-   ```
-   - You can directly use the application by loading the saved model and embeddings with the docker
-        ```bash
-        docker-compose build
-        docker-compose up
-        ```
-    - Frontend: You can start using the app by visiting [http://localhost:3000](http://localhost:3000)
-    - Backend: The FastApi backend that serves the React frontend can be accessed using [http://localhost:8000](http://localhost:8000)
-    - Database: The Qdrant vector database dashboard can be accessed using [http://localhost:6333/dashboard](http://localhost:6333/dashboard)
+2. **Application Startup**\
+      Navigate to the project directory:
+      ```bash
+      cd JTP-Technical-project/
+      ```
+      Utilize the application by loading the saved model and embeddings with Docker:
+      ```bash
+      docker-compose up --build
+      ```
+  - **Frontend:** The application can be accessed at [http://localhost:3000](http://localhost:3000), view a product to get recommendations.
+  - **Backend:** The FastAPI backend, serving the React frontend, is available at [http://localhost:8000](http://localhost:8000).
+  - **Database:** Access the Qdrant vector database dashboard at [http://localhost:6333/dashboard](http://localhost:6333/dashboard).
+        
 
+## Training Pipeline
+### You can also train the model from scratch instead of using pre-trained weights by following below instructions. 
 
-## Model Architecture
+  The training process is facilitated through notebooks located in `JTP-Technical-project/preprocessing/`.
 
-<!-- insert image here -->
-<!-- ![plot](./assets/model_architecture.png) -->
-<p align="center" style="height: 600px">
-  <img src="./assets/model_architecture.png" />
+  > **Note:**
+  > For training, running the Qdrant is necessary for saving the feature vectors/embeddings. [Click here to view instruction to set-up Qdrant](assets/QDRANT.md).
+  ### Please follow below steps to train model and store image embeddings:
+
+  - **Step-1 : Dataset Preparation**\
+      Utilize the [`dataset_pre_processing.ipynb`](preprocessing/dataset_pre_processing.ipynb) notebook for downloading the image dataset and creating test & train splits.
+  - **Step-2 : Training**\
+      The [`train.ipynb`](preprocessing/train.ipynb) notebook is used for training the Autoencoder model. The trained model is saved to [`backend/model/encoder_model.keras`](backend/model/encoder_model.keras).
+  - **Step-3 : Embedding** \
+      The [`embed.ipynb`](preprocessing/embed.ipynb) notebook allows for loading the saved model to extract feature vectors from images, which are then stored in the Qdrant vector database.
+
+      Follow instructions [here](assets/QDRANT.md) to take a snapshot of saved embeddings and save it to [backend/data/](backend/data/) as `fashion_products_vdb.snapshot`
+
+## Architecture
+
+<p align="center">
+  <img src="./assets/model_architecture.png" alt="Model Architecture" style="height: 600px;" />
 </p>
