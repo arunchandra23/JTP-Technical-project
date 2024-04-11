@@ -1,11 +1,10 @@
 from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.responses import JSONResponse
 import shutil
-from utils import find_similar_images_in_qdrant,suggest_unique_images,get_similar_images_by_id,check_collection_exists,restore_qdrant_collection,create_onedrive_directdownload
+from utils import find_similar_images_in_qdrant,suggest_unique_images,get_similar_images_by_id,check_collection_exists,restore_qdrant_collection
 from qdrant_client import QdrantClient
 from starlette.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from onedrivedownloader import download
 from logger import logger
 
 import os
@@ -21,10 +20,9 @@ client = QdrantClient(url=os.getenv("QDRANT_URL"),api_key=os.getenv("QDRANT_API_
 async def lifespan(app: FastAPI):
     collection_name = os.getenv("QDRANT_COLLECTION_NAME")
     if(not check_collection_exists(client,collection_name)):
-        url=create_onedrive_directdownload("https://1drv.ms/u/s!AlFy1_a40x6sgT9sI_OhBEMP5YAD?e=Kmp5Wl")
-        logger.info("Downloading Qdrant snapshot file")
-        download(url=url, filename="data/fashion_products_vdb.snapshot", unzip=False, clean=False)
         logger.info("Restoring Qdrant snapshot file")
+        if(os.path.exists('./data/fashion_products_vdb.snapshot')):
+            logger.error("Snapshot file not found! Please upload to ./data/fashion_products_vdb.snapshot")
         restore_qdrant_collection(
             qdrant_url=os.getenv("QDRANT_URL"),
             collection_name=collection_name,
