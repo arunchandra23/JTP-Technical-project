@@ -1,0 +1,2 @@
+“.snapshot” filter=lfs diff=lfs merge=lfs -text
+backend/data/fashion_products_vdb.snapshot filter=lfs diff=lfs merge=lfs -text

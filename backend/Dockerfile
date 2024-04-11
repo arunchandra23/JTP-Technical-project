@@ -1,17 +1,21 @@
 FROM python:3.10.8
 
-RUN mkdir -p app/backend
+# Set the working directory in the container
+WORKDIR /app
 
-COPY backend/requirements.txt app/backend/requirements.txt
-COPY Data app/Data
+# Copy the current directory contents into the container at /app
+COPY ./backend /app
 
-COPY backend app/backend
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-WORKDIR /app/backend
+# Make port 8000 available to the world outside this container
+EXPOSE 8000
 
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+# Define environment variable
+ENV MODULE_NAME="main"
+ENV VARIABLE_NAME="app"
+ENV PORT="8000"
 
-EXPOSE 8080
-
-CMD ["uvicorn","main:app","--host","0.0.0.0","--port","8080","--reload"]
+# Run app.py when the container launches
+CMD ["sh", "-c", "uvicorn ${MODULE_NAME}:${VARIABLE_NAME} --host 0.0.0.0 --port ${PORT}"]

@@ -55,7 +55,7 @@ const ImageUpload: React.FC<Props> = ({ onRecommendations }) => {
 
       try {
         // API endpoint as given in the curl command
-        const response = await fetch('http://127.0.0.1:8000/find-similar-images/?collection_name=fashion_t_t_2epochs&top_k=10', {
+        const response = await fetch('http://127.0.0.1:8000/find-similar-images/?collection_name=fashion_products_vdb&top_k=10', {
           method: 'POST',
           headers: {
             'accept': 'application/json',
@@ -102,7 +102,7 @@ const ImageUpload: React.FC<Props> = ({ onRecommendations }) => {
           </div>
         )}
         <div className="flex items-center justify-center my-5">
-        <button onClick={handleSubmit} className="ml-4  self-center bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+        <button onClick={handleSubmit} className="ml-4  self-center bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">
           Recommend
         </button>
 
