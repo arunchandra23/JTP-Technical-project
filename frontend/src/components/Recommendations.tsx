@@ -67,7 +67,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ handleRefresh }) => {
               />
             </svg>
 
-            <span className="mx-1">Refresh</span>
+            <span className="mx-1 hidden sm:block">Refresh</span>
           </button>
         </div>
       </div>

@@ -14,11 +14,7 @@ import base64
 
 
 
-def create_onedrive_directdownload (onedrive_link):
-    data_bytes64 = base64.b64encode(bytes(onedrive_link, 'utf-8'))
-    data_bytes64_String = data_bytes64.decode('utf-8').replace('/','_').replace('+','-').rstrip("=")
-    resultUrl = f"https://api.onedrive.com/v1.0/shares/u!{data_bytes64_String}/root/content"
-    return resultUrl
+
 
 def check_collection_exists(client, collection_name):
     try:
@@ -45,13 +41,16 @@ def restore_qdrant_collection(qdrant_url, collection_name, api_key, snapshot_fil
     - api_key: API key for Qdrant authentication.
     - snapshot_file_path: The file path to the snapshot file.
     """
-    snapshot_file_path = os.path.abspath(snapshot_file_path)
-    cu=f"""curl -X POST '{qdrant_url}/collections/{collection_name}/snapshots/upload?priority=snapshot' \
-    -H 'api-key: {api_key}' \
-    -H 'Content-Type:multipart/form-data' \
-    -F 'snapshot=@{snapshot_file_path}'"""
-    output = call_curl(cu)
-    logger.info(output)
+    try:
+        snapshot_file_path = os.path.abspath(snapshot_file_path)
+        cu=f"""curl -X POST '{qdrant_url}/collections/{collection_name}/snapshots/upload?priority=snapshot' \
+        -H 'api-key: {api_key}' \
+        -H 'Content-Type:multipart/form-data' \
+        -F 'snapshot=@{snapshot_file_path}'"""
+        output = call_curl(cu)
+        logger.info(output)
+    except Exception as e:
+        logger.error(f"Failed to restore collection '{collection_name}', please check Qdrant. Error: {e}")
     
 
 
