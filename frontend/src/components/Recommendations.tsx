@@ -22,7 +22,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ handleRefresh }) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    fetchRandomProducts(dispatch);
+    if (viewedImage === null) fetchRandomProducts(dispatch);
   }, [viewedImage]);
   useEffect(() => {
     const fetchRecommendations = async () => {

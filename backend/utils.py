@@ -231,36 +231,6 @@ def process_and_store_images_parallel(dataset_path,client, collection_name, vect
             store_single_embedding_in_qdrant(client, collection_name, image_detail, feature_vector)
 
 
-def find_similar_images_in_qdrant(client, collection_name, input_image, top_k=2):
-    """
-    Finds similar images to a given input image in a Qdrant collection.
-
-    Parameters:
-    - client: The Qdrant client instance.
-    - collection_name: The name of the collection to search.
-    - input_image: The path to the input image.
-    - top_k: The number of similar images to return (default is 2).
-
-    Returns:
-    - A list of dictionaries containing details of similar images.
-    """
-    loaded_encoder = load_model(os.getenv('ENCODER_MODEL_PATH'))
-
-    input_embedding = extract_embeddings([input_image], loaded_encoder, target_size=(32, 32))[0]
-
-    # input_reduced_features = input_features
-    search_result = client.search(
-        collection_name=collection_name,
-        query_vector=input_embedding,
-        query_filter=None,
-        limit=top_k,
-    )
-    logger.info(f"SR>>{search_result}")
-    similar_images = []
-    for hit in search_result:
-        similar_images.append({"filename":hit.payload['filename'], "url":hit.payload['url']})
-    return similar_images
-
 
 def qdrant_payload_as_dict(points):
     """
@@ -301,16 +271,20 @@ def suggest_unique_images(client, collection_name, top_k=20):
     Returns:
     - list of dict: A list of dictionaries, each containing the 'id' and 'image_path' of the suggested images.
     """
-    # Fetch all point IDs (or a large sample) from the collection
-    search_result = client.scroll(collection_name=collection_name, limit=10000)
-    points = search_result[0]
-    
-    # Randomly select point IDs without replacement to ensure uniqueness
-    selected_points = random.sample(points, min(top_k, len(points)))
-    
-    # Extract the image_path and other relevant info from the selected points
-    suggested_images = qdrant_payload_as_dict(selected_points)
-    return suggested_images
+    try:
+        # Fetch all point IDs (or a large sample) from the collection
+        search_result = client.scroll(collection_name=collection_name, limit=10000)
+        points = search_result[0]
+        
+        # Randomly select point IDs without replacement to ensure uniqueness
+        selected_points = random.sample(points, min(top_k, len(points)))
+        
+        # Extract the image_path and other relevant info from the selected points
+        suggested_images = qdrant_payload_as_dict(selected_points)
+        return {'content':suggested_images,'status_code':200}
+    except Exception as e:
+        logger.error(f"Failed to suggest unique images from collection '{collection_name}'. Error: {e}")
+        return {'content':[],'status_code':400}
 
 
 def get_similar_images_by_id(client, collection_name, image_id, top_k=5,page=0):
@@ -326,36 +300,39 @@ def get_similar_images_by_id(client, collection_name, image_id, top_k=5,page=0):
     Returns:
     - list: A list of similar image IDs, excluding the original image ID.
     """
-    # Fetch the vector of the specified image ID
-    point = client.retrieve(
-    collection_name=f"{collection_name}",
-    ids=[image_id],
-    with_vectors=True
-    )
-    if len(point)==0:
-        return []  # Return an empty list if the image ID is not found
-    point=point[0]
-    query_vector = point.vector
-    
-    # Search for similar images using the vector of the given image ID
-    search_results = client.search(
-        collection_name=collection_name,
-        query_vector=query_vector,
-        query_filter=models.Filter(must_not=[models.FieldCondition(
-            key="id",
-                match=models.MatchValue(
-                    value=image_id,
-                    )
-            )]), 
-        limit=top_k+1,
-        offset = page * top_k+1
-    )
-    if(len(search_results)!=0):
-        if(search_results[0].id==image_id):
-            search_results.pop(0)
-    # Extract the IDs and payload of the similar images
-    similar_image_ids = qdrant_payload_as_dict(search_results[:top_k])
-    
-    return similar_image_ids
-
+    try:
+        # Fetch the vector of the specified image ID
+        point = client.retrieve(
+        collection_name=f"{collection_name}",
+        ids=[image_id],
+        with_vectors=True
+        )
+        if len(point)==0:
+            return []  # Return an empty list if the image ID is not found
+        point=point[0]
+        query_vector = point.vector
+        
+        # Search for similar images using the vector of the given image ID
+        search_results = client.search(
+            collection_name=collection_name,
+            query_vector=query_vector,
+            query_filter=models.Filter(must_not=[models.FieldCondition(
+                key="id",
+                    match=models.MatchValue(
+                        value=image_id,
+                        )
+                )]), 
+            limit=top_k+1,
+            offset = page * top_k+1
+        )
+        if(len(search_results)!=0):
+            if(search_results[0].id==image_id):
+                search_results.pop(0)
+        # Extract the IDs and payload of the similar images
+        similar_images = qdrant_payload_as_dict(search_results[:top_k])
+        
+        return {'content':similar_images,'status_code':200}
+    except Exception as e:
+        logger.error(f"Failed to retrieve similar images for ID '{image_id}' from collection '{collection_name}'. Error: {e}")
+        return {'content':[],'status_code':400}
 

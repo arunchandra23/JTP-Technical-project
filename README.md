@@ -43,10 +43,10 @@ The system is trained using a dataset sourced from Kaggle, encompassing 44,000 f
 ## Train
   You can also train the model from scratch instead of using pre-trained weights by following below instructions. 
 
-  The training process is facilitated through notebooks located in [`preprocessing/`](preprocessing/).
+  The training process is facilitated through notebooks located in [`preprocessing/`](preprocessing/). Install the [requirements](backend/requirements.txt) to run the notebooks.
 
-  > **Note:**
-  > For training, running the Qdrant is necessary for saving the feature vectors/embeddings. [Setup Qdrant](assets/QDRANT.md).
+  > **Note:** For training, running the Qdrant is necessary for saving the feature vectors/embeddings. [Setup Qdrant](assets/QDRANT.md).
+
   ### Steps:
 
   - **Step-1 : Dataset Preparation**\
