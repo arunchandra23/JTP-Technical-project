@@ -22,7 +22,6 @@ export const imageSlice = createSlice({
     setRecommendationPage: (state, action: PayloadAction<number>) => {
         state.recommendationPage = action.payload;
     },
-    // Adjusting the PayloadAction to correctly reflect the expected type
     setModalData: (state, action: PayloadAction<ModalData | any>) => {
         state.modalData = action.payload;
     },

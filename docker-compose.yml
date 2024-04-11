@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: ./backend/Dockerfile
     ports:
-      - "8000:8000"
+      - "8008:8008"
     environment:
       - QDRANT_URL=http://db:6333
       - QDRANT_API_KEY=API_KEY
@@ -20,7 +20,7 @@ services:
       context: .
       dockerfile: ./frontend/Dockerfile
     ports:
-      - "3000:3000"
+      - "3003:3003"
     depends_on:
       - backend
 

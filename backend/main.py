@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, Form
+from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 import shutil
 from utils import find_similar_images_in_qdrant,suggest_unique_images,get_similar_images_by_id,check_collection_exists,restore_qdrant_collection
@@ -13,7 +13,7 @@ load_dotenv()
 
 
 client = QdrantClient(url=os.getenv("QDRANT_URL"),api_key=os.getenv("QDRANT_API_KEY"))
-# client = QdrantClient(url=os.getenv("QDRANT_URL"))
+
 
 # Lifespan event to restore qdrant collection if do not exist on startup
 @asynccontextmanager

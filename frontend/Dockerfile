@@ -12,6 +12,6 @@ COPY ./frontend/ /app/
 
 RUN npm run build
 
-EXPOSE 3000
+EXPOSE 3003
 
 CMD ["npm", "run","serve"]

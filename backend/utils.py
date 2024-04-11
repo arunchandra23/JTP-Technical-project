@@ -2,6 +2,7 @@ import os
 import shlex
 import subprocess
 import json
+import random
 import numpy as np
 import pandas as pd
 from concurrent.futures import ProcessPoolExecutor
@@ -10,13 +11,22 @@ from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import load_model
 import uuid as uuidpy
 from logger import logger
-import base64
 
 
 
 
 
 def check_collection_exists(client, collection_name):
+    """
+    Checks if a collection exists in the Qdrant server.
+
+    Parameters:
+    - client: The Qdrant client instance.
+    - collection_name: The name of the collection to check.
+
+    Returns:
+    - True if the collection exists, False otherwise.
+    """
     try:
         client.get_collection(collection_name)
         return True
@@ -25,6 +35,15 @@ def check_collection_exists(client, collection_name):
 
 
 def call_curl(curl):
+    """
+    Executes a cURL command and returns the JSON output.
+
+    Parameters:
+    - curl: The cURL command as a string.
+
+    Returns:
+    - The JSON output of the cURL command.
+    """
     args = shlex.split(curl)
     process = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
@@ -53,8 +72,15 @@ def restore_qdrant_collection(qdrant_url, collection_name, api_key, snapshot_fil
         logger.error(f"Failed to restore collection '{collection_name}', please check Qdrant. Error: {e}")
     
 
-
 def create_qdrant_collection(client, collection_name, vector_dim):
+    """
+    Creates a new collection in Qdrant with the specified vector dimension.
+
+    Parameters:
+    - client: The Qdrant client instance.
+    - collection_name: The name of the collection to create.
+    - vector_dim: The dimension of the vectors to be stored in the collection.
+    """
     try:
         if(not check_collection_exists(client=client,collection_name=collection_name)):
             client.create_collection(
@@ -71,6 +97,15 @@ def create_qdrant_collection(client, collection_name, vector_dim):
 
 
 def store_single_embedding_in_qdrant(client, collection_name, image_detail, feature_vector):
+    """
+    Stores a single image embedding in a Qdrant collection.
+
+    Parameters:
+    - client: The Qdrant client instance.
+    - collection_name: The name of the collection where the embedding will be stored.
+    - image_detail: A dictionary containing details about the image.
+    - feature_vector: The feature vector representing the image.
+    """
     # Create a payload with the image path
     payload = { "filename":image_detail['filename'], "url":image_detail['url'],"gender":image_detail['gender'],"masterCategory":image_detail['masterCategory'],"subCategory":image_detail['subCategory'],"articleType":image_detail['articleType'],"baseColour":image_detail['baseColour'],"season":image_detail['season'],"year":image_detail['year'],"usage":image_detail['usage'],"productDisplayName":image_detail['productDisplayName']}
     # Generate a unique ID for the point
@@ -83,6 +118,16 @@ def store_single_embedding_in_qdrant(client, collection_name, image_detail, feat
 
 
 def preprocess_image(image_path, target_size):
+    """
+    Preprocesses an image for input into a neural network.
+
+    Parameters:
+    - image_path: The path to the image file.
+    - target_size: The target size for the image (width, height).
+
+    Returns:
+    - The preprocessed image as a numpy array.
+    """
     # Load the image
     img = image.load_img(image_path, target_size=target_size, color_mode='rgb')
     # Convert the image to a numpy array
@@ -95,6 +140,17 @@ def preprocess_image(image_path, target_size):
 
 
 def extract_embeddings(image_paths, encoder, target_size):
+    """
+    Extracts embeddings for a list of images using a given encoder.
+
+    Parameters:
+    - image_paths: A list of paths to image files.
+    - encoder: The encoder model to use for extracting embeddings.
+    - target_size: The target size for the images (width, height).
+
+    Returns:
+    - A numpy array containing the embeddings for the input images.
+    """
     embeddings = []
     for image_path in image_paths:
         preprocessed_image = preprocess_image(image_path, target_size=target_size)
@@ -104,12 +160,30 @@ def extract_embeddings(image_paths, encoder, target_size):
 
 
 def compute_feature_vector(image_path):
+    """
+    Computes the feature vector for a single image using a pre-trained encoder from path in the environment variable.
+
+    Parameters:
+    - image_path: The path to the image file.
+
+    Returns:
+    - The feature vector representing the image.
+    """
     # Load the saved encoder model
     loaded_encoder = load_model(os.getenv('ENCODER_MODEL_PATH'))
     return extract_embeddings([image_path], loaded_encoder, target_size=(32, 32))[0]
 
 
 def process_image(image_detail):
+    """
+    Wrapper function for processing a single image and returns its details and feature vector.
+
+    Parameters:
+    - image_detail: A dictionary containing details about the image.
+
+    Returns:
+    - A tuple containing the image details and its feature vector.
+    """
     # Wrapper function for processing a single image
     # Returns a tuple containing the image_path and its feature_vector
     logger.info(f"IP>>{image_detail['image_path']}")
@@ -118,6 +192,17 @@ def process_image(image_detail):
 
 
 def process_and_store_images_parallel(dataset_path,client, collection_name, vector_dim,csv_path, max_workers=None):
+    """
+    Processes and stores images in a Qdrant collection in parallel.
+
+    Parameters:
+    - dataset_path: The path to the dataset directory.
+    - client: The Qdrant client instance.
+    - collection_name: The name of the collection where embeddings will be stored.
+    - vector_dim: The dimension of the vectors to be stored in the collection.
+    - csv_path: The path to the CSV file containing image details.
+    - max_workers: The maximum number of worker processes to use (default is None).
+    """
     create_qdrant_collection(client, collection_name, vector_dim)
     # Read the csv file containing image details and urls
     image_details=[]
@@ -147,6 +232,18 @@ def process_and_store_images_parallel(dataset_path,client, collection_name, vect
 
 
 def find_similar_images_in_qdrant(client, collection_name, input_image, top_k=2):
+    """
+    Finds similar images to a given input image in a Qdrant collection.
+
+    Parameters:
+    - client: The Qdrant client instance.
+    - collection_name: The name of the collection to search.
+    - input_image: The path to the input image.
+    - top_k: The number of similar images to return (default is 2).
+
+    Returns:
+    - A list of dictionaries containing details of similar images.
+    """
     loaded_encoder = load_model(os.getenv('ENCODER_MODEL_PATH'))
 
     input_embedding = extract_embeddings([input_image], loaded_encoder, target_size=(32, 32))[0]
@@ -164,10 +261,17 @@ def find_similar_images_in_qdrant(client, collection_name, input_image, top_k=2)
         similar_images.append({"filename":hit.payload['filename'], "url":hit.payload['url']})
     return similar_images
 
-import random
-
 
 def qdrant_payload_as_dict(points):
+    """
+    Converts Qdrant point payloads to a list of dictionaries.
+
+    Parameters:
+    - points: A list of Qdrant points.
+
+    Returns:
+    - A list of dictionaries containing payload data.
+    """
     payloads=[]
     for point in points:
         payloads.append({
@@ -184,8 +288,7 @@ def qdrant_payload_as_dict(points):
             })
     return payloads
      
-     
-     
+         
 def suggest_unique_images(client, collection_name, top_k=20):
     """
     Suggests a random sample of unique images from a Qdrant collection.

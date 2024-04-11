@@ -10,11 +10,11 @@ At the heart of the recommendation engine is an autoencoder model. This model is
 
 ### Dataset
 
-The system is trained using a dataset sourced from Kaggle, encompassing 44,000 fashion products. This dataset includes multiple category labels, product descriptions, and high-resolution images, making it a comprehensive foundation for training our model. The dataset is accessible here: [Fashion Product Images Dataset](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset?rvi=1)
+The system is trained using a dataset sourced from Kaggle, encompassing 44,000 fashion products. This dataset includes multiple category labels, product descriptions, and high-resolution images, making it a comprehensive foundation for training the model. The dataset is accessible here: [Fashion Product Images Dataset](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset?rvi=1)
 
 ### Technology Stack
 
-- **Backend:** The backend infrastructure is constructed using **FastAPI**, a contemporary and fast web framework designed for building APIs with Python.
+- **Backend:** The backend is constructed using **FastAPI**, a modern framework that enables rapid API development in Python.
 - **Frontend:** For the frontend, **React JS** is employed, with **Redux** serving as the state management solution, ensuring a dynamic and seamless user interface.
 - **Vector Database:** The image feature vectors are stored and queried using **Qdrant**, a vector database that enables efficient similarity searches.
 
@@ -35,12 +35,12 @@ The system is trained using a dataset sourced from Kaggle, encompassing 44,000 f
       ```bash
       docker-compose up --build
       ```
-  - **Frontend:** The application can be accessed at [http://localhost:3000](http://localhost:3000), view a product to get recommendations.
-  - **Backend:** The FastAPI backend, serving the React frontend, is available at [http://localhost:8000](http://localhost:8000).
+  - **Frontend:** The application can be accessed at [http://localhost:3003](http://localhost:3003), view a product to get recommendations.
+  - **Backend:** The FastAPI backend, serving the React frontend, is available at [http://localhost:8008](http://localhost:8008), View the API documentation at [http://localhost:8008/docs](http://localhost:8008/docs).
   - **Database:** Access the Qdrant vector database dashboard at [http://localhost:6333/dashboard](http://localhost:6333/dashboard).
         
 
-## Training Pipeline
+## Train
   You can also train the model from scratch instead of using pre-trained weights by following below instructions. 
 
   The training process is facilitated through notebooks located in [`preprocessing/`](preprocessing/).
