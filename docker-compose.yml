@@ -9,8 +9,6 @@ services:
       - "8008:8008"
     environment:
       - QDRANT_URL=http://db:6333
-      - QDRANT_API_KEY=API_KEY
-      - ENCODER_MODEL_PATH=backend/model/encoder_model.keras
     depends_on:
       - db
 
