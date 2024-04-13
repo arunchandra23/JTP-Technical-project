@@ -8,6 +8,8 @@ This project focuses on developing an Image Recommendation System aimed at enhan
 
 At the heart of the recommendation engine is an autoencoder model. This model is adept at learning image features through an unsupervised learning approach. Specifically, the encoder part of the autoencoder is utilized to generate feature vectors for images. These vectors are subsequently stored in a Qdrant vector database, which underpins efficient similarity searches and retrieval of products that visually align with the user's interests.
 
+  [View in detail architecture and details of the autoencoder model](./assets/AUTOENCODER.md)
+
 ### Dataset
 
 The system is trained using a dataset sourced from Kaggle, encompassing 44,000 fashion products. This dataset includes multiple category labels, product descriptions, and high-resolution images, making it a comprehensive foundation for training the model. The dataset is accessible here: [Fashion Product Images Dataset](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset?rvi=1)
