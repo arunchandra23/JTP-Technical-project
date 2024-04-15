@@ -2,13 +2,21 @@
 
 ## Overview
 
-This project implements an image recommendation system that leverages an autoencoder model to analyze and recommend products based on visual similarity. The system allows users to view products and receive suggestions for similar items, enhancing user engagement and satisfaction by providing a personalized shopping experience.
+This project implements an image recommendation system that leverages an autoencoder model to analyze and recommend products based on visual similarity. Initially starting with handcrafted techniques and transitioning to deep learning, the system allows users to view products and receive suggestions for similar items, enhancing user engagement and satisfaction by providing a personalized shopping experience.
 
-## Model Description
+## Approach - 1
+
+Initially, the project employed handcrafted image processing techniques, utilizing color histograms, texture features, and edge detection to analyze product images. While these methods provided a foundational approach to image similarity, they fell short in capturing complex patterns and variations across different products, leading to unsatisfactory recommendation accuracy.
+
+Recognizing the limitations of the initial approach, the project transitioned to a more advanced deep learning method by employing an autoencoder. This shift was aimed at extracting deeper and more abstract features from the images in an unsupervised manner, significantly improving the quality and relevance of the recommendations.
+
+[View the notebook here[Depricated]](./depricated/Approach_1.ipynb)
+
+## Approach - 2
 
 ### Why Use an Autoencoder?
 
-The autoencoder is central to our system for its ability to learn efficient representations (feature vectors) in an unsupervised manner. This capability is crucial since it allows us to utilize unlabeled image data effectively, focusing solely on the visual features of the products. These learned representations are then used to identify and recommend products that are visually similar to a given item.
+The autoencoder is central to our updated system for its ability to learn efficient representations (feature vectors) in an unsupervised manner. This capability is crucial since it allows us to effectively utilize unlabeled image data, focusing solely on the visual features of the products. These learned representations are then used to identify and recommend products that are visually similar to a given item.
 
 ### Model Architecture
 
@@ -29,9 +37,8 @@ The autoencoder model is designed to compress image data into a lower-dimensiona
 - **Convolutional Transpose Layers:** Mirrors the encoder's convolutional layers but in reverse, using convolutional transpose operations to upscale the image back to its original dimensions.
 - **Output Layer:** A convolutional layer with a sigmoid activation function produces the reconstructed image with the same shape as the input.
 
-<!-- <h3>Get Recommendations!</h3> -->
 <p align="center">
-  <img src="./model_architecture.png" alt="screenshot_3" style="height: 600px;" />
+  <img src="./model_architecture.png" alt="Model Architecture" style="height: 600px;" />
 </p>
 
 ## Image Feature Extraction

@@ -10,6 +10,9 @@ import ImageCard from "./ImageCard";
 interface RecommendationsProps {
   handleRefresh: () => void;
 }
+
+
+
 const Recommendations: React.FC<RecommendationsProps> = ({ handleRefresh }) => {
   const imageUrls: ImageData[] = useAppSelector(
     (state) => state.image.imageUrls
@@ -24,7 +27,11 @@ const Recommendations: React.FC<RecommendationsProps> = ({ handleRefresh }) => {
   useEffect(() => {
     if (viewedImage === null) fetchRandomProducts(dispatch);
   }, [viewedImage]);
+
   useEffect(() => {
+    /**
+     * Fetches recommendations based on the viewed image.
+     */
     const fetchRecommendations = async () => {
       try {
         const response = await request.get(
@@ -39,10 +46,16 @@ const Recommendations: React.FC<RecommendationsProps> = ({ handleRefresh }) => {
         console.error("Failed to fetch images", error);
       }
     };
+
     if (viewedImage !== null) fetchRecommendations();
   }, [viewedImage, recommendationPage]);
-  const handleView = async (image:ImageData) => {
-    dispatch(setModalData({ visible: true, imageData:image}));
+
+  /**
+   * Handles the click event when an image is viewed.
+   * @param image The image data.
+   */
+  const handleView = async (image: ImageData) => {
+    dispatch(setModalData({ visible: true, imageData: image }));
   };
 
   return (

@@ -4,6 +4,16 @@ interface Props {
   image: ImageData;
   onClick: (image:ImageData) => void;
 }
+
+/**
+ * Represents an image card component.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {Object} props.image - The image object.
+ * @param {Function} props.onClick - The click event handler for the image card.
+ * @returns {JSX.Element} The rendered ImageCard component.
+ */
 const ImageCard: React.FC<Props> = ({ image, onClick }) => {
   return (
     <div

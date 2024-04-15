@@ -3,7 +3,12 @@ import { setModalData, setViewedImage } from "../redux/imageSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { ModalData } from "../common/types";
 
+/**
+ * Represents a modal component for displaying an image.
+ */
+
 const ImageModal: React.FC = () => {
+  
   const dispatch = useAppDispatch();
   const modalData: ModalData = useAppSelector((state) => state.image.modalData);
   // console.log(modalData);

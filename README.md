@@ -1,26 +1,36 @@
 # JTP-Technical-project - Image Recommendation System
 
-## Overview
+## Index
+
+- [Introduction](#introduction)
+- [Quickstart](#quickstart)
+- [Train](#train)
+- [Approaches](#approaches)
+- [Workflow](#workflow)
+- [Screenshots](#screenshots)
+
+## Introduction
 
 This project focuses on developing an Image Recommendation System aimed at enhancing the shopping experience by suggesting products that are visually similar to the one being viewed by the user. By doing so, it offers a tailored and engaging browsing experience.
+
 
 ### Core Engine
 
 At the heart of the recommendation engine is an autoencoder model. This model is adept at learning image features through an unsupervised learning approach. Specifically, the encoder part of the autoencoder is utilized to generate feature vectors for images. These vectors are subsequently stored in a Qdrant vector database, which underpins efficient similarity searches and retrieval of products that visually align with the user's interests.
 
-  [View in detail architecture and details of the autoencoder model](./assets/AUTOENCODER.md)
 
 ### Dataset
 
 The system is trained using a dataset sourced from Kaggle, encompassing 44,000 fashion products. This dataset includes multiple category labels, product descriptions, and high-resolution images, making it a comprehensive foundation for training the model. The dataset is accessible here: [Fashion Product Images Dataset](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset?rvi=1)
 
 ### Technology Stack
-
 - **Backend:** The backend is constructed using **FastAPI**, a modern framework that enables rapid API development in Python.
 - **Frontend:** For the frontend, **React JS** is employed, with **Redux** serving as the state management solution, ensuring a dynamic and seamless user interface.
 - **Vector Database:** The image feature vectors are stored and queried using **Qdrant**, a vector database that enables efficient similarity searches.
 
-## Setup Instructions
+
+## Quickstart
+### Setup Instructions
   > **Prerequisites:** Docker installed on your machine, and a basic understanding of Docker and terminal commands.
 
 1. **Repository Cloning:**
@@ -40,10 +50,10 @@ The system is trained using a dataset sourced from Kaggle, encompassing 44,000 f
   - **Frontend:** The application can be accessed at [http://localhost:3003](http://localhost:3003), view a product to get recommendations.
   - **Backend:** The FastAPI backend, serving the React frontend, is available at [http://localhost:8008](http://localhost:8008), View the API documentation at [http://localhost:8008/docs](http://localhost:8008/docs).
   - **Database:** Access the Qdrant vector database dashboard at [http://localhost:6333/dashboard](http://localhost:6333/dashboard).
-        
 
 ## Train
-  You can also train the model from scratch instead of using pre-trained weights by following below instructions. 
+
+You can also train the model from scratch instead of using pre-trained weights by following the instructions below.
 
   The training process is facilitated through notebooks located in [`preprocessing/`](preprocessing/). Install the [requirements](backend/requirements.txt) to run the notebooks.
 
@@ -60,22 +70,26 @@ The system is trained using a dataset sourced from Kaggle, encompassing 44,000 f
 
       Follow [instructions](assets/QDRANT.md) to take a snapshot of saved embeddings in Qdrant collection and copy it to [backend/data/](backend/data/) as `fashion_products_vdb.snapshot`
 
-## Architecture
+## Approaches
 
-<p align="center">
-  <img src="./assets/app_architecture.jpg" alt="Model Architecture" style="height: 400px;" />
-</p>
+  [View approaches](./assets/AUTOENCODER.md)
+
+## Workflow
+
+### Backend
+
+[View workflow](./assets/WORKFLOW.md)
 
 ## Screenshots
 <h3>Home screen</h3>
 <p align="center">
-  <img src="./assets/screenshot_1.png" alt="screenshot_1" style="height: 400px;" />
+  <img src="./assets/screenshot_1.png" alt="Home screen"  />
 </p>
 <h3>View the product</h3>
 <p align="center">
-  <img src="./assets/screenshot_2.png" alt="screenshot_2" style="height: 400px;" />
+  <img src="./assets/screenshot_2.png" alt="View the product"  />
 </p>
 <h3>Get Recommendations!</h3>
 <p align="center">
-  <img src="./assets/screenshot_3.png" alt="screenshot_3" style="height: 400px;" />
+  <img src="./assets/screenshot_3.png" alt="Get Recommendations"  />
 </p>

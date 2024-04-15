@@ -49,10 +49,38 @@ app.add_middleware(
 
 @app.get("/get-products/")
 async def get_products(collection_name: str,top_k:int):
+    """
+    Retrieve top_k random products from a collection to populate the frontend with products for the user to view and get visually similar recommendations.
+
+    Args:
+        collection_name (str): The name of the collection.
+        top_k (int): The number of products to retrieve.
+
+    Returns:
+        JSONResponse: The response containing the retrieved products.
+    """
     result=suggest_unique_images(client, collection_name, top_k=top_k)
     return JSONResponse(content=result['content'], status_code=result['status_code'])
 
 @app.get("/get-recommendations/")
-def get_recomendations(image_id:str,collection_name: str,top_k:int,page:int=0):
+async def get_recomendations(image_id:str,collection_name: str,top_k:int,page:int=0):
+    """
+    Retrieves recommendations for a given image ID from a specified collection.
+    
+    Steps:
+        1. Retrieve the embeddings of the image from the collection by image ID.
+        2. Retrieve the top_k similar images to the image from the collection by performing a cosine similarity search.
+        3. Return the recommendations in JSON format with metadata such as image ID, image URL etc.
+
+    Parameters:
+        image_id (str): The ID of the image for which recommendations are to be retrieved.
+        collection_name (str): The name of the collection from which recommendations are to be retrieved.
+        top_k (int): The number of recommendations to retrieve.
+        page (int, optional): The page number of the recommendations. Defaults to 0.
+
+    Returns:
+        JSONResponse: The recommendations in JSON format.
+
+    """
     result=get_similar_images_by_id(client, collection_name, image_id, top_k=top_k,page=page)
     return JSONResponse(content=result['content'], status_code=result['status_code'])
