@@ -10,7 +10,7 @@ Initially, the project employed handcrafted image processing techniques, utilizi
 
 Recognizing the limitations of the initial approach, the project transitioned to a more advanced deep learning method by employing an autoencoder. This shift was aimed at extracting deeper and more abstract features from the images in an unsupervised manner, significantly improving the quality and relevance of the recommendations.
 
-[View the notebook here[Depricated]](./depricated/Approach_1.ipynb)
+[View the notebook here[deprecated]](./deprecated/Approach_1.ipynb)
 
 ## Approach - 2
 

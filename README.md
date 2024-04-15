@@ -30,7 +30,7 @@ The system is trained using a dataset sourced from Kaggle, encompassing 44,000 f
 
 
 ## Quickstart
-### Setup Instructions
+  ### This Loads pre-trained weights and restores already created feature vectors of images to Qdrant 
   > **Prerequisites:** Docker installed on your machine, and a basic understanding of Docker and terminal commands.
 
 1. **Repository Cloning:**
@@ -75,8 +75,6 @@ You can also train the model from scratch instead of using pre-trained weights b
   [View approaches](./assets/AUTOENCODER.md)
 
 ## Workflow
-
-### Backend
 
 [View workflow](./assets/WORKFLOW.md)
 
