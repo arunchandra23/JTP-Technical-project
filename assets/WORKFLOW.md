@@ -70,6 +70,12 @@ This document outlines the workflow of the Image Recommendation System which int
 <!-- [![](./workflow.png)] -->
 </p>
 
+## Frontend
+
+[![My Skills](https://skillicons.dev/icons?i=react,ts,redux,tailwind&perline=4)](https://skillicons.dev)
+
+The frontend of the Image Recommendation System is developed using React JS with TypeScript, ensuring robust, scalable, and maintainable code. The state management is handled by Redux, providing a predictable state container that manages the application state efficiently. For styling, Tailwind CSS is used, offering a utility-first CSS framework that enables rapid and responsive design.
+
 ## Conclusion
 
 This system effectively bridges the gap between browsing and personalized recommendations by leveraging advanced image processing techniques in the backend and delivering a seamless and interactive user experience on the frontend. By continuously refining the product vectors and recommendation algorithms, the system aims to enhance accuracy and user satisfaction.
