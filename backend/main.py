@@ -1,23 +1,34 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 import shutil
-from utils import suggest_unique_images,get_similar_images_by_id,check_collection_exists,restore_qdrant_collection
 from qdrant_client import QdrantClient
 from starlette.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from logger import logger
+from utils import suggest_unique_images,get_similar_images_by_id,check_collection_exists,restore_qdrant_collection
 
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
-
+# load the Qdrant client with the Qdrant URL and API key from the environment variables
 client = QdrantClient(url=os.getenv("QDRANT_URL"),api_key=os.getenv("QDRANT_API_KEY"))
 
 
 # Lifespan event to restore qdrant collection if do not exist on startup
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """
+    A function that handles the lifespan of the FastAPI application.
+    The function restores the Qdrant collection if it does not exist on startup.
+    - The snapshot contains the feature vectors of the images that are generated using the the autoencoder model that was trained before. 
+
+    Args:
+        app (FastAPI): The FastAPI application instance.
+
+    Yields:
+        None: This function is a generator and does not return any value.
+    """
     collection_name = os.getenv("QDRANT_COLLECTION_NAME")
     if(not check_collection_exists(client,collection_name)):
         logger.info("Restoring Qdrant snapshot file")

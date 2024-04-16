@@ -45,6 +45,10 @@ The autoencoder model is designed to compress image data into a lower-dimensiona
 
 Once trained, the encoder part of the autoencoder is used to extract features from images. These features, or latent representations, are then stored in a vector database (Qdrant), enabling efficient retrieval of similar images based on their content.
 
+<p align="center">
+  <img src="./embedding.png" alt="embedding pipeline" />
+</p>
+
 ## Recommendations
 
 The recommendation mechanism utilizes the vector database to perform cosine similarity, finding images whose feature vectors are closest to that of the query image, thereby suggesting products with the most visual similarity.
