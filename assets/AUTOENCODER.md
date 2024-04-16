@@ -41,6 +41,12 @@ The autoencoder model is designed to compress image data into a lower-dimensiona
   <img src="./model_architecture.png" alt="Model Architecture" style="height: 600px;" />
 </p>
 
+
+## Training Details
+
+The autoencoder model is trained for 25 epochs with a batch size of 64, which has been found to be the best configuration for my hardware setup. This setting balances the need for computational efficiency while ensuring sufficient training depth to learn adequate features.
+
+
 ## Image Feature Extraction
 
 Once trained, the encoder part of the autoencoder is used to extract features from images. These features, or latent representations, are then stored in a vector database (Qdrant), enabling efficient retrieval of similar images based on their content.

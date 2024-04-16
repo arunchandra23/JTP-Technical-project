@@ -1,6 +1,6 @@
 # JTP-Technical-project - Image Recommendation System
 
-## Index
+## Table of Contents
 
 - [Introduction](#introduction)
 - [Quickstart](#quickstart)
